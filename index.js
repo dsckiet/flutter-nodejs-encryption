@@ -45,8 +45,8 @@ app.post("/encrypt", (req, res) => {
 	console.log(req.body);
 	//  data = JSON.stringify({ name: "Rohan", age: 12 });
 	// var message = "Hello World";
-	var token = "01234567890123456789012345678901";
-	var cipherIV = "0123456789012345";
+	var token = process.env.key;
+	var cipherIV = process.env.iv;
 	var result = encrypt(JSON.stringify(data), token, cipherIV);
 	console.log(result);
 	res.json({
@@ -60,8 +60,8 @@ app.post("/decrypt", (req, res) => {
 	//coverting from base64 to uint8
 	let encrptedBytes = new Uint8Array(Buffer.from(encrypted, "base64"));
 	console.log(encrptedBytes);
-	var token = "01234567890123456789012345678901";
-	var cipherIV = "0123456789012345";
+	var token = process.env.key;
+	var cipherIV = process.env.iv;
 	var result = decrypt(encrptedBytes, token, cipherIV);
 	res.json({
 		message: "success",
