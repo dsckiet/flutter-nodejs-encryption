@@ -26,43 +26,41 @@ const encrypt = (data, token, cipherIV) => {
 	const aesCbc = new AES.ModeOfOperation.cbc(key, iv);
 	const dataBytes = AES.utils.utf8.toBytes(data);
 	const paddedData = AES.padding.pkcs7.pad(dataBytes);
-	const encryptedBytes = aesCbc.encrypt(paddedData);
-	return encryptedBytes;
+	const encryptedBytes = aesCbc.encrypt(paddedData); 
+	return encryptedBytes; // uint8Array
 };
 const decrypt = (data, token, cipherIV) => {
 	const key = AES.utils.utf8.toBytes(token);
 	const iv = AES.utils.utf8.toBytes(cipherIV);
 	const aesCbc = new AES.ModeOfOperation.cbc(key, iv);
-	const decryptedData = aesCbc.decrypt(data);
+	const decryptedData = aesCbc.decrypt(data); // uint8Array
 	const unpadData = AES.padding.pkcs7.strip(decryptedData);
 
-	return AES.utils.utf8.fromBytes(unpadData);
-	// return decryptedData;
+	return AES.utils.utf8.fromBytes(unpadData); // string
 };
 //Routes
 app.post("/encrypt", (req, res) => {
-	let { data } = req.body;
-	console.log(req.body);
-	//  data = JSON.stringify({ name: "Rohan", age: 12 });
-	// var message = "Hello World";
+	let { data } = req.body; // getting body for the request, can be removed and replaced with internal data from database
+	//  data = JSON.stringify({ name: "Rohan", age: 12 }); // to encrypt complex data
+	
 	var token = process.env.key;
 	var cipherIV = process.env.iv;
 	var result = encrypt(JSON.stringify(data), token, cipherIV);
-	console.log(result);
+	console.log(result); // uint8Array
 	res.json({
 		message: "success",
-		encrypted: Buffer.from(result).toString("base64"),
+		encrypted: Buffer.from(result).toString("base64"), // send the base64 encoded version
 	});
 });
 
 app.post("/decrypt", (req, res) => {
-	let { encrypted } = req.body;
+	let { encrypted } = req.body; // get the base64 encoded string
 	//coverting from base64 to uint8
 	let encrptedBytes = new Uint8Array(Buffer.from(encrypted, "base64"));
-	console.log(encrptedBytes);
+	console.log(encrptedBytes); // uint8Array
 	var token = process.env.key;
 	var cipherIV = process.env.iv;
-	var result = decrypt(encrptedBytes, token, cipherIV);
+	var result = decrypt(encrptedBytes, token, cipherIV); // string
 	res.json({
 		message: "success",
 		decrypted: JSON.parse(result),
